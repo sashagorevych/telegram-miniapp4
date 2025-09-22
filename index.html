@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>База знаний</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            flex: 1;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-container {
+            padding: 20px;
+            background: rgba(15, 20, 25, 0.95);
+            z-index: 90;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(45, 45, 45, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.3s ease;
+            padding: 8px 4px;
+        }
+
+        .nav-button:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-button.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-button:hover img,
+        .nav-button.active img {
+            opacity: 1;
+        }
+
+        .nav-button span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .event-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .event-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #10b981, #059669);
+            opacity: 0.8;
+        }
+
+        .event-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .event-content {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .event-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .event-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .event-date {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .event-time {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .event-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 90px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 180px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+            z-index: 1;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #d4af37;
+            color: #2d2d2d;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .category-content {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            z-index: 2;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .category-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .category-icon {
+            position: absolute;
+            top: 15px;
+            right: 45px;
+            font-size: 32px;
+            opacity: 0.8;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sort-dropdown {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .content-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .content-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-item:hover::before {
+            opacity: 1;
+        }
+
+        .content-main-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .content-main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .content-duration-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .favorite-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .content-main-image .emoji-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            opacity: 0.8;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content-details {
+            padding: 15px;
+        }
+
+        .content-header {
+            margin-bottom: 10px;
+        }
+
+        .content-thumbnail {
+            display: none;
+        }
+
+        .content-info {
+            flex: 1;
+        }
+
+        .content-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .content-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .content-speaker {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .content-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .content-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .content-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid {
+                gap: 12px;
+            }
+            
+            .category-card {
+                height: 160px;
+            }
+            
+            .container {
+                padding: 15px;
+                padding-bottom: 90px;
+            }
+            
+            .content-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .nav-button span {
+                font-size: 11px;
+            }
+
+            .nav-button img {
+                width: 22px;
+                height: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <button class="back-btn" id="backBtn" style="display: none;">‹</button>
+            <div class="header-title" id="headerTitle">База знаний</div>
+            <button class="refresh-btn" id="refreshBtn">🔄</button>
+        </div>
+    </div>
+
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск...">
+            <div class="search-icon">🔍</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Главная страница с категориями -->
+        <div id="categoriesView">
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="loading">Загрузка категорий...</div>
+            </div>
+        </div>
+
+        <!-- Страница контента категории -->
+        <div id="contentView" class="content-section">
+            <div class="section-header">
+                <h2 id="sectionTitle">Загрузка...</h2>
+                <select class="sort-dropdown" id="sortDropdown">
+                    <option value="title">По названию</option>
+                    <option value="speaker">По спикеру</option>
+                    <option value="season">По сезону</option>
+                    <option value="duration">По длительности</option>
+                </select>
+            </div>
+            <div class="content-list" id="contentList">
+                <div class="loading">Загрузка контента...</div>
+            </div>
+        </div>
+
+        <!-- Календарь событий -->
+        <div id="calendarView" class="content-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="eventsSearchInput" placeholder="Поиск событий...">
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+            
+            <div class="section-header">
+                <h2>📅 Календарь событий</h2>
+                <select class="sort-dropdown" id="eventsSortDropdown">
+                    <option value="date">По дате</option>
+                    <option value="title">По названию</option>
+                </select>
+            </div>
+            
+            <div class="events-list" id="eventsList">
+                <div class="loading">Загрузка событий...</div>
+            </div>
+        </div>
+
+        <!-- Избранное -->
+        <div id="favoritesView" class="content-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="favoritesSearchInput" placeholder="Поиск в избранном...">
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+            
+            <div class="section-header">
+                <h2>❤️ Избранное</h2>
+                <select class="sort-dropdown" id="favoritesSortDropdown">
+                    <option value="title">По названию</option>
+                    <option value="speaker">По спикеру</option>
+                    <option value="category">По категории</option>
+                    <option value="date_added">По дате добавления</option>
+                </select>
+            </div>
+            
+            <div class="content-list" id="favoritesList">
+                <div class="empty-state">
+                    <div class="empty-icon">💔</div>
+                    <div>Избранное пусто</div>
+                    <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">Добавьте материалы, нажав на ❤️</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-navigation">
+        <button class="nav-button active" id="homeNavBtn" onclick="showHome()">
+            <img src="https://raw.githubusercontent.com/sashagorevych/telegram-miniapp/main/Home.png" alt="Главная">
+            <span>Главная</span>
+        </button>
+        <button class="nav-button" id="calendarNavBtn" onclick="showCalendar()">
+            <img src="https://raw.githubusercontent.com/sashagorevych/telegram-miniapp/main/calendar.png" alt="Календарь">
+            <span>Календарь</span>
+        </button>
+        <button class="nav-button" id="favoritesNavBtn" onclick="showFavorites()">
+            <img src="https://raw.githubusercontent.com/sashagorevych/telegram-miniapp/main/favorite.png" alt="Избранное">
+            <span>Избранное</span>
+        </button>
+    </div>
+
+    <div class="status-bar" id="statusBar"></div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Конфигурация Google Sheets API v4
+        const SHEETS_API_CONFIG = {
+            API_KEY: 'AIzaSyDa-19DGZ1AkxHx55EDGUb3l4ulYNHXU7I',
+            SPREADSHEET_ID: '1ysOISP2VSrqq8dTwQN-JQnfNeZVpKieKafrfHr2q4KE',
+            
+            getCategoriesUrl() {
+                return `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/categories?key=${this.API_KEY}`;
+            },
+            
+            getContentUrl() {
+                return `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/content?key=${this.API_KEY}`;
+            },
+            
+            getEventsUrl() {
+                return `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/events?key=${this.API_KEY}`;
+            }
+        };
+
+        // Инициализация Telegram Web App
+        const tg = window.Telegram?.WebApp || {};
+        
+        // Состояние приложения
+        let appData = {
+            categories: [],
+            content: [],
+            events: [],
+            favorites: [], // Список избранных материалов
+            currentCategory: null,
+            filteredContent: [],
+            filteredEvents: [],
+            filteredFavorites: [],
+            currentView: 'categories',
+            searchQuery: '',
+            eventsSearchQuery: '',
+            favoritesSearchQuery: '',
+            isLoading: false
+        };
+
+        // Элементы DOM
+        const elements = {
+            categoriesView: document.getElementById('categoriesView'),
+            contentView: document.getElementById('contentView'),
+            calendarView: document.getElementById('calendarView'),
+            favoritesView: document.getElementById('favoritesView'),
+            categoriesGrid: document.getElementById('categoriesGrid'),
+            contentList: document.getElementById('contentList'),
+            eventsList: document.getElementById('eventsList'),
+            favoritesList: document.getElementById('favoritesList'),
+            eventsSearchInput: document.getElementById('eventsSearchInput'),
+            favoritesSearchInput: document.getElementById('favoritesSearchInput'),
+            headerTitle: document.getElementById('headerTitle'),
+            backBtn: document.getElementById('backBtn'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            searchInput: document.getElementById('searchInput'),
+            searchContainer: document.getElementById('searchContainer'),
+            sectionTitle: document.getElementById('sectionTitle'),
+            sortDropdown: document.getElementById('sortDropdown'),
+            eventsSortDropdown: document.getElementById('eventsSortDropdown'),
+            favoritesSortDropdown: document.getElementById('favoritesSortDropdown'),
+            statusBar: document.getElementById('statusBar'),
+            homeNavBtn: document.getElementById('homeNavBtn'),
+            calendarNavBtn: document.getElementById('calendarNavBtn'),
+            favoritesNavBtn: document.getElementById('favoritesNavBtn')
+        };
+
+        // Функции для работы с избранным
+        function loadFavorites() {
+            const saved = localStorage.getItem('favorites');
+            if (saved) {
+                try {
+                    appData.favorites = JSON.parse(saved);
+                } catch (e) {
+                    appData.favorites = [];
+                }
+            }
+        }
+
+        function saveFavorites() {
+            localStorage.setItem('favorites', JSON.stringify(appData.favorites));
+        }
+
+        function isFavorite(contentId) {
+            return appData.favorites.some(fav => fav.id === contentId);
+        }
+
+        function toggleFavorite(content, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            const existingIndex = appData.favorites.findIndex(fav => fav.id === content.id);
+            
+            if (existingIndex >= 0) {
+                // Удаляем из избранного
+                appData.favorites.splice(existingIndex, 1);
+                showStatus('Удалено из избранного');
+            } else {
+                // Добавляем в избранное
+                const favoriteItem = {
+                    ...content,
+                    dateAdded: Date.now()
+                };
+                appData.favorites.push(favoriteItem);
+                showStatus('Добавлено в избранное');
+            }
+            
+            saveFavorites();
+            
+            // Обновляем UI в зависимости от текущего вида
+            if (appData.currentView === 'content') {
+                renderContent();
+            } else if (appData.currentView === 'favorites') {
+                searchFavorites();
+            }
+        }
+
+        // Инициализация приложения
+        async function initApp() {
+            if (tg.expand) tg.expand();
+            if (tg.ready) tg.ready();
+            
+            loadFavorites();
+            setupEventListeners();
+            updateNavigation();
+            await loadData();
+        }
+
+        // Показ статуса
+        function showStatus(message, duration = 3000) {
+            elements.statusBar.textContent = message;
+            elements.statusBar.style.display = 'block';
+            
+            setTimeout(() => {
+                elements.statusBar.style.display = 'none';
+            }, duration);
+        }
+
+        // Загрузка данных
+        async function loadData() {
+            appData.isLoading = true;
+            showStatus('Загрузка данных...');
+            
+            try {
+                await loadSheetsAPIData();
+                renderCategories();
+                showStatus('Данные загружены!', 2000);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+                showError('Ошибка загрузки данных из Google Таблицы');
+                showStatus('Ошибка загрузки!', 2000);
+            } finally {
+                appData.isLoading = false;
+            }
+        }
+
+        // Загрузка данных через Google Sheets API v4
+        async function loadSheetsAPIData() {
+            try {
+                console.log('Загружаем категории через API...');
+                const categoriesResponse = await fetchSheetsAPIData(SHEETS_API_CONFIG.getCategoriesUrl());
+                appData.categories = parseSheetsAPIData(categoriesResponse);
+                
+                console.log('Загружаем контент через API...');
+                const contentResponse = await fetchSheetsAPIData(SHEETS_API_CONFIG.getContentUrl());
+                appData.content = parseSheetsAPIData(contentResponse);
+                
+                console.log('Загружаем события через API...');
+                const eventsResponse = await fetchSheetsAPIData(SHEETS_API_CONFIG.getEventsUrl());
+                appData.events = parseSheetsAPIData(eventsResponse);
+                
+                console.log('Финальные категории:', appData.categories);
+                console.log('Финальный контент:', appData.content);
+                console.log('Финальные события:', appData.events);
+                
+                // Обновляем счетчики категорий
+                appData.categories.forEach(category => {
+                    const count = appData.content.filter(item => item.category_id == category.id).length;
+                    category.count = count;
+                });
+                
+            } catch (error) {
+                console.error('Полная ошибка API:', error);
+                throw new Error('Не удалось загрузить данные: ' + error.message);
+            }
+        }
+
+        // Получение данных из Google Sheets API v4
+        async function fetchSheetsAPIData(url) {
+            try {
+                console.log(`Загружаем через API: ${url}`);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Получены данные:', data);
+                
+                return data;
+                
+            } catch (error) {
+                throw new Error(`Ошибка Sheets API: ${error.message}`);
+            }
+        }
+
+        // Парсинг данных Google Sheets API v4
+        function parseSheetsAPIData(apiResponse) {
+            if (!apiResponse.values || apiResponse.values.length === 0) {
+                console.log('Нет данных в ответе API');
+                return [];
+            }
+            
+            const rows = apiResponse.values;
+            const headers = rows[0];
+            console.log('Заголовки:', headers);
+            
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const values = rows[i];
+                if (!values || values.length === 0) continue;
+                
+                const item = {};
+                headers.forEach((header, index) => {
+                    const value = values[index] || '';
+                    
+                    // Конвертируем числовые поля
+                    if (header === 'id' || header === 'category_id' || header === 'count' || header === 'views') {
+                        item[header] = parseInt(value) || 0;
+                    } else {
+                        item[header] = value.toString().trim();
+                    }
+                });
+                
+                if (item.id) data.push(item);
+            }
+            
+            console.log('Обработанные данные:', data);
+            return data;
+        }
+
+        // Отрисовка категорий
+        function renderCategories() {
+            if (appData.categories.length === 0) {
+                elements.categoriesGrid.innerHTML = `
+                    <div class="error-state">
+                        <div class="error-icon">⚠️</div>
+                        <div>Категории не найдены</div>
+                        <div style="font-size: 12px; margin-top: 10px;">Проверьте настройки Google Таблицы</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const categoriesHTML = appData.categories.map(category => `
+                <div class="category-card" onclick="openCategory(${category.id})">
+                    ${category.image ? `<img src="${category.image}" alt="${category.title}" class="category-image" onerror="this.style.display='none'">` : ''}
+                    <div class="category-badge">${category.count || 0}</div>
+                </div>
+            `).join('');
+            
+            elements.categoriesGrid.innerHTML = categoriesHTML;
+        }
+
+        // Показать главную страницу
+        function showHome() {
+            appData.currentView = 'categories';
+            appData.currentCategory = null;
+            
+            elements.categoriesView.style.display = 'block';
+            elements.contentView.classList.remove('active');
+            elements.calendarView.classList.remove('active');
+            elements.favoritesView.classList.remove('active');
+            
+            // Показываем основной поиск обратно
+            elements.searchContainer.style.display = 'block';
+            
+            elements.backBtn.style.display = 'none';
+            elements.headerTitle.textContent = 'База знаний';
+            elements.searchInput.value = '';
+            appData.searchQuery = '';
+            
+            updateNavigation();
+        }
+
+        // Показать календарь
+        function showCalendar() {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            appData.currentView = 'calendar';
+            appData.currentCategory = null;
+            
+            elements.categoriesView.style.display = 'none';
+            elements.contentView.classList.remove('active');
+            elements.calendarView.classList.add('active');
+            elements.favoritesView.classList.remove('active');
+            
+            elements.backBtn.style.display = 'none';
+            elements.headerTitle.textContent = 'Календарь событий';
+            
+            // Скрываем основной поиск для календаря
+            elements.searchContainer.style.display = 'none';
+            
+            // Очищаем поиски
+            elements.searchInput.value = '';
+            appData.searchQuery = '';
+            appData.eventsSearchQuery = '';
+            
+            // Инициализируем отфильтрованные события
+            appData.filteredEvents = [...appData.events];
+            renderEvents();
+            updateNavigation();
+        }
+
+        // Показать избранное
+        function showFavorites() {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            appData.currentView = 'favorites';
+            appData.currentCategory = null;
+            
+            elements.categoriesView.style.display = 'none';
+            elements.contentView.classList.remove('active');
+            elements.calendarView.classList.remove('active');
+            elements.favoritesView.classList.add('active');
+            
+            elements.backBtn.style.display = 'none';
+            elements.headerTitle.textContent = 'Избранное';
+            
+            // Скрываем основной поиск для избранного
+            elements.searchContainer.style.display = 'none';
+            
+            // Очищаем поиски
+            elements.searchInput.value = '';
+            appData.searchQuery = '';
+            appData.favoritesSearchQuery = '';
+            
+            // Инициализируем отфильтрованное избранное
+            appData.filteredFavorites = [...appData.favorites];
+            renderFavorites();
+            updateNavigation();
+        }
+
+        // Обновление навигации
+        function updateNavigation() {
+            elements.homeNavBtn.classList.toggle('active', appData.currentView === 'categories');
+            elements.calendarNavBtn.classList.toggle('active', appData.currentView === 'calendar');
+            elements.favoritesNavBtn.classList.toggle('active', appData.currentView === 'favorites');
+        }
+
+        // Отрисовка событий
+        function renderEvents() {
+            if (appData.filteredEvents.length === 0) {
+                if (appData.events.length === 0) {
+                    elements.eventsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <div>События не найдены</div>
+                        </div>
+                    `;
+                } else {
+                    elements.eventsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div>По вашему запросу ничего не найдено</div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            const eventsHTML = appData.filteredEvents.map(event => `
+                <div class="event-item" onclick="openEvent('${event.url}', '${event.title}')">
+                    <div class="event-content">
+                        <div class="event-photo">
+                            ${event.image ? `<img src="${event.image}" alt="${event.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
+                            <span style="display: ${event.image ? 'none' : 'block'};">📅</span>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-header">
+                                <div class="event-title">${event.title}</div>
+                                ${event.date ? `<div class="event-date">${formatEventDate(event.date)}</div>` : ''}
+                            </div>
+                            <div class="event-time">
+                                ${event.time ? `🕐 ${event.time}` : ''}
+                                ${event.time && event.speaker ? ' • ' : ''}
+                                ${event.speaker ? `👤 ${event.speaker}` : ''}
+                            </div>
+                            <div class="event-description">${event.description || ''}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            elements.eventsList.innerHTML = eventsHTML;
+        }
+
+        // Отрисовка избранного
+        function renderFavorites() {
+            if (appData.filteredFavorites.length === 0) {
+                if (appData.favorites.length === 0) {
+                    elements.favoritesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">💔</div>
+                            <div>Избранное пусто</div>
+                            <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">Добавьте материалы, нажав на ❤️</div>
+                        </div>
+                    `;
+                } else {
+                    elements.favoritesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div>По вашему запросу ничего не найдено</div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            const favoritesHTML = appData.filteredFavorites.map(item => {
+                const category = appData.categories.find(cat => cat.id === item.category_id);
+                return `
+                    <div class="content-item" onclick="openContent('${item.url}', '${item.title}')">
+                        <div class="content-main-image">
+                            ${item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
+                            <div class="emoji-overlay" style="display: ${item.image ? 'none' : 'block'};">${item.thumbnail || '📄'}</div>
+                            ${item.duration ? `<div class="content-duration-badge">${item.duration}</div>` : ''}
+                            <button class="favorite-btn active" onclick="toggleFavorite(${JSON.stringify(item).replace(/"/g, '&quot;')}, event)">
+                                🩶
+                            </button>
+                        </div>
+                        <div class="content-details">
+                            <div class="content-header">
+                                <div class="content-info">
+                                    <div class="content-title">${item.title}</div>
+                                    <div class="content-meta">
+                                        ${item.season ? `<span>🎯 Сезон ${item.season}</span>` : ''}
+                                        ${category ? `<span>📂 ${category.title}</span>` : ''}
+                                        <span>📅 ${new Date(item.dateAdded).toLocaleDateString('ru-RU')}</span>
+                                    </div>
+                                    ${item.speaker ? `<div class="content-speaker">👤 ${item.speaker}</div>` : ''}
+                                    <div class="content-tags">
+                                        ${parseTags(item.tags).map(tag => `<span class="content-tag">${tag}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-description">${item.description || ''}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            elements.favoritesList.innerHTML = favoritesHTML;
+        }
+
+        // Открытие события
+        function openEvent(url, title) {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+            
+            if (!url || url === 'undefined' || url === 'null') {
+                showStatus('Ссылка не найдена');
+                return;
+            }
+            
+            if (tg.openLink) {
+                tg.openLink(url);
+            } else {
+                window.open(url, '_blank');
+            }
+            
+            // Отправляем данные боту
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({
+                    action: 'event_opened',
+                    title: title,
+                    url: url,
+                    timestamp: Date.now()
+                }));
+            }
+        }
+
+        // Форматирование даты события
+        function formatEventDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (date.toDateString() === today.toDateString()) {
+                return 'Сегодня';
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return 'Завтра';
+            } else {
+                return date.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+                });
+            }
+        }
+
+        // Открытие категории
+        function openCategory(categoryId) {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            appData.currentCategory = categoryId;
+            appData.currentView = 'content';
+            const category = appData.categories.find(c => c.id === categoryId);
+            
+            if (!category) {
+                showError('Категория не найдена');
+                return;
+            }
+            
+            // Обновляем UI
+            elements.categoriesView.style.display = 'none';
+            elements.calendarView.classList.remove('active');
+            elements.favoritesView.classList.remove('active');
+            elements.contentView.classList.add('active');
+            elements.backBtn.style.display = 'block';
+            elements.headerTitle.textContent = category.title;
+            elements.sectionTitle.textContent = category.title;
+            
+            // Загружаем контент
+            loadCategoryContent(categoryId);
+            updateNavigation();
+        }
+
+        // Загрузка контента категории
+        function loadCategoryContent(categoryId) {
+            elements.contentList.innerHTML = '<div class="loading">Загрузка контента...</div>';
+            
+            setTimeout(() => {
+                const content = appData.content.filter(item => item.category_id == categoryId);
+                appData.filteredContent = [...content];
+                renderContent();
+            }, 300);
+        }
+
+        // Отрисовка контента
+        function renderContent() {
+            if (appData.filteredContent.length === 0) {
+                elements.contentList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div>Контент не найден</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const contentHTML = appData.filteredContent.map(item => `
+                <div class="content-item" onclick="openContent('${item.url}', '${item.title}')">
+                    <div class="content-main-image">
+                        ${item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ''}
+                        <div class="emoji-overlay" style="display: ${item.image ? 'none' : 'block'};">${item.thumbnail || '📄'}</div>
+                        ${item.duration ? `<div class="content-duration-badge">${item.duration}</div>` : ''}
+                        <button class="favorite-btn ${isFavorite(item.id) ? 'active' : ''}" onclick="toggleFavorite(${JSON.stringify(item).replace(/"/g, '&quot;')}, event)">
+                            ${isFavorite(item.id) ? '🩶' : '🤍'}
+                        </button>
+                    </div>
+                    <div class="content-details">
+                        <div class="content-header">
+                            <div class="content-info">
+                                <div class="content-title">${item.title}</div>
+                                <div class="content-meta">
+                                    ${item.season ? `<span>🎯 Сезон ${item.season}</span>` : ''}
+                                </div>
+                                ${item.speaker ? `<div class="content-speaker">👤 ${item.speaker}</div>` : ''}
+                                <div class="content-tags">
+                                    ${parseTags(item.tags).map(tag => `<span class="content-tag">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-description">${item.description || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            elements.contentList.innerHTML = contentHTML;
+        }
+
+        // Открытие контента
+        function openContent(url, title) {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+            
+            if (!url || url === 'undefined') {
+                showStatus('Ссылка не найдена');
+                return;
+            }
+            
+            if (tg.openLink) {
+                tg.openLink(url);
+            } else {
+                window.open(url, '_blank');
+            }
+            
+            // Отправляем данные боту
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify({
+                    action: 'content_opened',
+                    title: title,
+                    url: url,
+                    category: appData.currentCategory,
+                    timestamp: Date.now()
+                }));
+            }
+        }
+
+        // Возврат к категориям
+        function goBack() {
+            showHome();
+        }
+
+        // Поиск контента
+        function searchContent() {
+            appData.searchQuery = elements.searchInput.value.toLowerCase().trim();
+            
+            if (!appData.currentCategory) return;
+            
+            const allContent = appData.content.filter(item => item.category_id == appData.currentCategory);
+            
+            if (!appData.searchQuery) {
+                appData.filteredContent = [...allContent];
+            } else {
+                appData.filteredContent = allContent.filter(item => 
+                    item.title.toLowerCase().includes(appData.searchQuery) ||
+                    item.description.toLowerCase().includes(appData.searchQuery) ||
+                    (item.speaker || '').toLowerCase().includes(appData.searchQuery) ||
+                    item.tags.toLowerCase().includes(appData.searchQuery)
+                );
+            }
+            
+            renderContent();
+        }
+
+        // Поиск событий
+        function searchEvents() {
+            if (!elements.eventsSearchInput) return;
+            
+            appData.eventsSearchQuery = elements.eventsSearchInput.value.toLowerCase().trim();
+            
+            if (!appData.eventsSearchQuery) {
+                appData.filteredEvents = [...appData.events];
+            } else {
+                appData.filteredEvents = appData.events.filter(event => 
+                    (event.title || '').toLowerCase().includes(appData.eventsSearchQuery) ||
+                    (event.description || '').toLowerCase().includes(appData.eventsSearchQuery)
+                );
+            }
+            
+            sortEvents();
+        }
+
+        // Поиск в избранном
+        function searchFavorites() {
+            if (!elements.favoritesSearchInput) return;
+            
+            appData.favoritesSearchQuery = elements.favoritesSearchInput.value.toLowerCase().trim();
+            
+            if (!appData.favoritesSearchQuery) {
+                appData.filteredFavorites = [...appData.favorites];
+            } else {
+                appData.filteredFavorites = appData.favorites.filter(item => 
+                    (item.title || '').toLowerCase().includes(appData.favoritesSearchQuery) ||
+                    (item.description || '').toLowerCase().includes(appData.favoritesSearchQuery) ||
+                    (item.speaker || '').toLowerCase().includes(appData.favoritesSearchQuery) ||
+                    (item.tags || '').toLowerCase().includes(appData.favoritesSearchQuery)
+                );
+            }
+            
+            sortFavorites();
+        }
+
+        // Сортировка контента
+        function sortContent() {
+            const sortType = elements.sortDropdown.value;
+            
+            appData.filteredContent.sort((a, b) => {
+                switch (sortType) {
+                    case 'title':
+                        return a.title.localeCompare(b.title);
+                    case 'speaker':
+                        return (a.speaker || '').localeCompare(b.speaker || '');
+                    case 'season':
+                        return (a.season || '').localeCompare(b.season || '');
+                    case 'duration':
+                        const aDuration = parseInt((a.duration || '0').match(/\d+/)?.[0] || '0');
+                        const bDuration = parseInt((b.duration || '0').match(/\d+/)?.[0] || '0');
+                        return bDuration - aDuration;
+                    default:
+                        return 0;
+                }
+            });
+            
+            renderContent();
+        }
+
+        // Сортировка событий
+        function sortEvents() {
+            if (!elements.eventsSortDropdown) return;
+            
+            const sortType = elements.eventsSortDropdown.value;
+            
+            appData.filteredEvents.sort((a, b) => {
+                switch (sortType) {
+                    case 'date':
+                        const dateA = new Date(a.date || '1970-01-01');
+                        const dateB = new Date(b.date || '1970-01-01');
+                        return dateA - dateB;
+                    case 'title':
+                        return (a.title || '').localeCompare(b.title || '');
+                    default:
+                        return 0;
+                }
+            });
+            
+            renderEvents();
+        }
+
+        // Сортировка избранного
+        function sortFavorites() {
+            if (!elements.favoritesSortDropdown) return;
+            
+            const sortType = elements.favoritesSortDropdown.value;
+            
+            appData.filteredFavorites.sort((a, b) => {
+                switch (sortType) {
+                    case 'title':
+                        return (a.title || '').localeCompare(b.title || '');
+                    case 'speaker':
+                        return (a.speaker || '').localeCompare(b.speaker || '');
+                    case 'category':
+                        const categoryA = appData.categories.find(cat => cat.id === a.category_id);
+                        const categoryB = appData.categories.find(cat => cat.id === b.category_id);
+                        return (categoryA?.title || '').localeCompare(categoryB?.title || '');
+                    case 'date_added':
+                        return (b.dateAdded || 0) - (a.dateAdded || 0); // Новые сверху
+                    default:
+                        return 0;
+                }
+            });
+            
+            renderFavorites();
+        }
+
+        // Показ ошибки
+        function showError(message) {
+            elements.categoriesGrid.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <div>${message}</div>
+                    <button onclick="loadData()" style="margin-top: 15px; padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer;">
+                        Повторить
+                    </button>
+                </div>
+            `;
+        }
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            elements.backBtn.addEventListener('click', goBack);
+            elements.refreshBtn.addEventListener('click', loadData);
+            elements.searchInput.addEventListener('input', searchContent);
+            elements.sortDropdown.addEventListener('change', sortContent);
+            
+            // Проверяем существование элементов перед добавлением обработчиков
+            if (elements.eventsSearchInput) {
+                elements.eventsSearchInput.addEventListener('input', searchEvents);
+            }
+            if (elements.eventsSortDropdown) {
+                elements.eventsSortDropdown.addEventListener('change', sortEvents);
+            }
+            if (elements.favoritesSearchInput) {
+                elements.favoritesSearchInput.addEventListener('input', searchFavorites);
+            }
+            if (elements.favoritesSortDropdown) {
+                elements.favoritesSortDropdown.addEventListener('change', sortFavorites);
+            }
+        }
+
+        // Утилиты
+        function formatViews(views) {
+            if (views >= 1000000) return Math.floor(views / 1000000) + 'M';
+            if (views >= 1000) return Math.floor(views / 1000) + 'K';
+            return views.toString();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', { 
+                day: 'numeric', 
+                month: 'short' 
+            });
+        }
+
+        function parseTags(tagsString) {
+            if (!tagsString) return [];
+            return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        }
+
+        // Запуск приложения
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
